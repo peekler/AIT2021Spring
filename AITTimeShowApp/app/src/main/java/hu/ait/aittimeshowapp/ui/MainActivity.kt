@@ -3,9 +3,12 @@ package hu.ait.aittimeshowapp.ui
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewAnimationUtils
+import android.widget.Toast
 import androidx.annotation.RequiresApi
+import com.google.android.material.snackbar.Snackbar
 import hu.ait.aittimeshowapp.R
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
@@ -18,7 +21,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         btnShow.setOnClickListener {
-            tvData.text = Date(System.currentTimeMillis()).toString()
+            var dateText = etName.text.toString()+" "+getString(R.string.text_time, Date(System.currentTimeMillis()).toString())
+
+            Log.d("TAG_DEMO", dateText)
+
+
+            tvData.text = dateText
+            Toast.makeText(this, dateText,
+                    Toast.LENGTH_LONG).show()
+
+
+            Snackbar.make(layoutMain, dateText, Snackbar.LENGTH_LONG).show()
+
+            val car = Car()
+
 
             revealCard()
         }

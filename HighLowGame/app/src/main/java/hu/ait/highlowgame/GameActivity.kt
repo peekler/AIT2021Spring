@@ -1,11 +1,17 @@
 package hu.ait.highlowgame
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_game.*
 import kotlin.random.Random
 
 class GameActivity : AppCompatActivity() {
+
+    companion object {
+        const val KEY_GEN = "KEY_GEN"
+    }
+
 
     var generatedNum = 0
 
@@ -14,7 +20,11 @@ class GameActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
-        generateRandomNumber()
+        if (savedInstanceState != null && savedInstanceState.containsKey(KEY_GEN)) {
+            generatedNum = savedInstanceState.getInt(KEY_GEN)
+        } else {
+            generateRandomNumber()
+        }
 
         btnGuess.setOnClickListener {
 
@@ -25,6 +35,9 @@ class GameActivity : AppCompatActivity() {
 
                     if (myGuess == generatedNum) {
                         tvStatus.text = "You have won!"
+
+                        startActivity(Intent(this, ResultActivity::class.java))
+
                     } else if (myGuess < generatedNum) {
                         tvStatus.text = "The number is higher"
                     } else {
@@ -38,12 +51,18 @@ class GameActivity : AppCompatActivity() {
             }
 
         }
-
-
     }
 
     fun generateRandomNumber() {
-        generatedNum = Random(System.currentTimeMillis()).nextInt(100) //0..99
+        generatedNum = Random(System.currentTimeMillis()).nextInt(5) //0..99
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putInt(KEY_GEN, generatedNum)
+    }
+
+
 
 }

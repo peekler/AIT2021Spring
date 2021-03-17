@@ -14,9 +14,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import hu.ait.todorecyclerview.adapter.TodoAdapter
+import hu.ait.todorecyclerview.data.AppDatabase
 import hu.ait.todorecyclerview.data.Todo
 import hu.ait.todorecyclerview.touch.TouchCallback
 import kotlinx.android.synthetic.main.activity_scrolling.*
+import java.util.*
+import kotlin.concurrent.thread
+
+import androidx.lifecycle.Observer
 
 class ScrollingActivity : AppCompatActivity(), TodoDialog.TodoHandler {
 
@@ -30,19 +35,8 @@ class ScrollingActivity : AppCompatActivity(), TodoDialog.TodoHandler {
         findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout).title = title
 
 
-        todoAdapter = TodoAdapter(this)
-        recyclerTodo.adapter = todoAdapter
+        initRecyclerView()
 
-        val touchCallbakList = TouchCallback(todoAdapter)
-        val itemTouchHelper = ItemTouchHelper(touchCallbakList)
-        itemTouchHelper.attachToRecyclerView(recyclerTodo)
-
-
-
-        //val itemDecoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        //recyclerTodo.addItemDecoration(itemDecoration)
-        //recyclerTodo.layoutManager = GridLayoutManager(this, 2)
-        //recyclerTodo.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
 
         fab.setOnClickListener {
@@ -50,9 +44,25 @@ class ScrollingActivity : AppCompatActivity(), TodoDialog.TodoHandler {
         }
     }
 
+    private fun initRecyclerView() {
+        todoAdapter = TodoAdapter(this)
+        recyclerTodo.adapter = todoAdapter
+
+        AppDatabase.getInstance(this).todoDao().getAllTodo()
+            .observe(this, Observer { items ->
+                todoAdapter.submitList(items)
+            })
+
+        val touchCallbakList = TouchCallback(todoAdapter)
+        val itemTouchHelper = ItemTouchHelper(touchCallbakList)
+        itemTouchHelper.attachToRecyclerView(recyclerTodo)
+    }
+
 
     override fun todoCreated(todo: Todo) {
-        todoAdapter.addTodo(todo)
+        thread {
+            AppDatabase.getInstance(this).todoDao().addTodo(todo)
+        }
     }
 
 

@@ -33,5 +33,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        btnDeleteAll.setOnClickListener {
+            thread {
+                AppDatabase.getInstance(this).gradeDao().deleteAllGrades()
+            }
+        }
     }
 }

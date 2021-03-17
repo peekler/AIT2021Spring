@@ -16,6 +16,9 @@ interface GradeDAO {
     @Query("SELECT * FROM grade WHERE grade = :grade")
     fun getSpecificGrades(grade: String): List<Grade>
 
+    @Query("DELETE FROM grade")
+    fun deleteAllGrades()
+
     @Insert
     fun insertGrades(vararg grades: Grade)
 

@@ -55,6 +55,7 @@ class TodoDialog : DialogFragment() {
 
             todoHandler.todoCreated(
                 Todo(
+                    null,
                     Date(System.currentTimeMillis()).toString(),
                     cbTodoDone.isChecked,
                     etTodoText.text.toString()

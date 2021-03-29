@@ -1,6 +1,7 @@
 package hu.ait.todorecyclerview
 
 import android.os.Bundle
+import android.preference.PreferenceManager
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -22,8 +23,15 @@ import java.util.*
 import kotlin.concurrent.thread
 
 import androidx.lifecycle.Observer
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 
 class ScrollingActivity : AppCompatActivity(), TodoDialog.TodoHandler {
+
+    companion object {
+        const val KEY_TODO_EDIT = "KEY_TODO_EDIT"
+
+        const val KEY_FIRST = "KEY_FIRST"
+    }
 
     lateinit var todoAdapter: TodoAdapter
 
@@ -37,11 +45,33 @@ class ScrollingActivity : AppCompatActivity(), TodoDialog.TodoHandler {
 
         initRecyclerView()
 
-
-
         fab.setOnClickListener {
             TodoDialog().show(supportFragmentManager, "TAG_TODO_DIALOG")
         }
+
+
+        if (isFirstRun()) {
+            MaterialTapTargetPrompt.Builder(this@ScrollingActivity)
+                .setTarget(findViewById<View>(R.id.fab))
+                .setPrimaryText("New Todo Item")
+                .setSecondaryText("Tap here to create new todo item")
+                .show()
+        }
+
+        saveThatItWasStarted()
+    }
+
+    private fun isFirstRun(): Boolean {
+        return PreferenceManager.getDefaultSharedPreferences(this).getBoolean(
+            KEY_FIRST, true
+        )
+    }
+
+    private fun saveThatItWasStarted() {
+        val sp = PreferenceManager.getDefaultSharedPreferences(this)
+        sp.edit()
+            .putBoolean(KEY_FIRST, false)
+            .apply()
     }
 
     private fun initRecyclerView() {
@@ -65,6 +95,11 @@ class ScrollingActivity : AppCompatActivity(), TodoDialog.TodoHandler {
         }
     }
 
+    override fun todoUpdated(todo: Todo) {
+        thread {
+            AppDatabase.getInstance(this).todoDao().updateTodo(todo)
+        }
+    }
 
     public fun showDeleteMessage() {
         Snackbar.make(recyclerTodo, "Todo removed", Snackbar.LENGTH_LONG)
@@ -74,6 +109,16 @@ class ScrollingActivity : AppCompatActivity(), TodoDialog.TodoHandler {
                 }
             })
             .show()
+    }
+
+    public fun showEditDialog(todoToEdit: Todo) {
+        val editDialog = TodoDialog()
+
+        val bundle = Bundle()
+        bundle.putSerializable(KEY_TODO_EDIT, todoToEdit)
+        editDialog.arguments = bundle
+
+        editDialog.show(supportFragmentManager, "TAG_ITEM_EDIT")
     }
 
 }

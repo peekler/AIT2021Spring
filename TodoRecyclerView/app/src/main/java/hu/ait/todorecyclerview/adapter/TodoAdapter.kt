@@ -34,6 +34,17 @@ class TodoAdapter(var context: Context) : ListAdapter<Todo, TodoAdapter.ViewHold
         holder.btnDelete.setOnClickListener {
             deleteTodo(holder.adapterPosition)
         }
+
+        holder.btnEdit.setOnClickListener {
+            (context as ScrollingActivity).showEditDialog(todo)
+        }
+
+        holder.cbDone.setOnClickListener {
+            todo.done = holder.cbDone.isChecked
+            thread {
+                AppDatabase.getInstance(context).todoDao().updateTodo(todo)
+            }
+        }
     }
 
     private var deletedTodo: Todo? = null
@@ -68,6 +79,7 @@ class TodoAdapter(var context: Context) : ListAdapter<Todo, TodoAdapter.ViewHold
         val tvDate = itemView.tvDate
         val cbDone = itemView.cbDone
         val btnDelete = itemView.btnDelete
+        val btnEdit = itemView.btnEdit
     }
 
 }

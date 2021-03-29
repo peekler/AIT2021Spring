@@ -16,6 +16,7 @@ class TodoDialog : DialogFragment() {
 
     interface TodoHandler {
         fun todoCreated(todo: Todo)
+        fun todoUpdated(todo: Todo)
     }
 
     lateinit var todoHandler: TodoHandler
@@ -35,9 +36,9 @@ class TodoDialog : DialogFragment() {
     lateinit var etTodoText : EditText
     lateinit var cbTodoDone : CheckBox
 
+    var inEditMode = false
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         val dialogBuilder = AlertDialog.Builder(requireContext())
 
         dialogBuilder.setTitle("Todo dialog")
@@ -47,27 +48,65 @@ class TodoDialog : DialogFragment() {
         )
         etTodoText = dialogView.etTodoText
         cbTodoDone = dialogView.cbTodoDone
-
         dialogBuilder.setView(dialogView)
+
+        inEditMode = (this.arguments != null && this.arguments!!.containsKey(ScrollingActivity.KEY_TODO_EDIT))
+
+        if (inEditMode) {
+            val todoEdit = this.arguments!!.getSerializable(ScrollingActivity.KEY_TODO_EDIT) as Todo
+            etTodoText.setText(todoEdit.todoText)
+            cbTodoDone.isChecked = todoEdit.done
+        }
 
         dialogBuilder.setPositiveButton("Ok") {
             dialog, which ->
-
-            todoHandler.todoCreated(
-                Todo(
-                    null,
-                    Date(System.currentTimeMillis()).toString(),
-                    cbTodoDone.isChecked,
-                    etTodoText.text.toString()
-                )
-            )
+            //
         }
         dialogBuilder.setNegativeButton("Cancel") {
             dialog, which ->
-
+            //
         }
 
         return dialogBuilder.create()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        val dialog = dialog as AlertDialog
+        val positiveButton = dialog.getButton(Dialog.BUTTON_POSITIVE)
+
+        positiveButton.setOnClickListener {
+            if (etTodoText.text.isNotEmpty()) {
+                if (inEditMode) {
+                    handleTodoEdit()
+                } else {
+                    handleTodoCreate()
+                }
+
+                dialog.dismiss()
+            } else {
+                etTodoText.error = "This field can not be empty"
+            }
+        }
+    }
+
+    private fun handleTodoCreate() {
+        todoHandler.todoCreated(Todo(
+            null,
+            Date(System.currentTimeMillis()).toString(),
+            false,
+            etTodoText.text.toString(),
+        ))
+    }
+
+    private fun handleTodoEdit() {
+        val todoToEdit = (arguments?.getSerializable(
+            ScrollingActivity.KEY_TODO_EDIT) as Todo).copy(
+            todoText =  etTodoText.text.toString(),
+            done = cbTodoDone.isChecked
+        )
+
+        todoHandler.todoUpdated(todoToEdit)
+    }
 }

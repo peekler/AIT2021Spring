@@ -49,4 +49,7 @@ dependencies {
     def room_version = "2.2.6"
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
+
+    implementation 'uk.co.samuelwall:material-tap-target-prompt:2.3.0'
+
 }

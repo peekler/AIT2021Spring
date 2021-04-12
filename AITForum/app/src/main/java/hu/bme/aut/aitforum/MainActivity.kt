@@ -1,5 +1,6 @@
 package hu.bme.aut.aitforum
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -11,6 +12,29 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+    }
+
+    fun loginClick(v: View) {
+        if (!isFormValid()){
+            return
+        }
+
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(
+            etEmail.text.toString(), etPassword.text.toString()
+        ).addOnSuccessListener {
+            Toast.makeText(this@MainActivity,
+                "Login OK",
+                Toast.LENGTH_LONG).show()
+
+            // navigate to other Activity
+            startActivity(Intent(this, ForumActivity::class.java))
+
+        }.addOnFailureListener{
+            Toast.makeText(this@MainActivity,
+                "Error: ${it.message}",
+                Toast.LENGTH_LONG).show()
+        }
+
     }
 
     fun registerClick(v: View){

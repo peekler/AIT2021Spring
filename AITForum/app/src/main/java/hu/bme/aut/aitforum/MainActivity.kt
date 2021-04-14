@@ -6,15 +6,21 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        FirebaseMessaging.getInstance().subscribeToTopic("aitforum")
     }
 
     fun loginClick(v: View) {
+        //throw RuntimeException("Demo exception")
+
+
         if (!isFormValid()){
             return
         }

@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         moneyAPI = retrofit.create(MoneyAPI::class.java)
 
         btnGetMoney.setOnClickListener {
-            val call = moneyAPI.getRates("969c37b5a73f8cb2d12c081dcbdc35e6")
+            val call = moneyAPI.getRates(BuildConfig.MONEY_API_KEY)
             call.enqueue(object: Callback<MoneyResult> {
                 override fun onResponse(call: Call<MoneyResult>, response: Response<MoneyResult>) {
                     tvData.text = response.body()!!.rates!!.HUF.toString()

@@ -4,28 +4,18 @@ plugins {
     id 'kotlin-android-extensions'
 }
 
-Properties localProps = new Properties()
-if (project.rootProject.file('key.properties').canRead()) {
-    localProps.load(new FileInputStream(project.rootProject.file('key.properties')))
-} else {
-    System.err.println("local.properties file is missing, please create it.")
-}
-
-
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "hu.bme.aut.httpmoneyapidemo"
+        applicationId "hu.bme.aut.qrcodereader"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField 'String', 'MONEY_API_KEY', "\"" + localProps['money.apikey'] + "\""
     }
 
     buildTypes {
@@ -54,7 +44,5 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
-    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
-    implementation 'com.google.code.gson:gson:2.8.5'
-    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+    implementation 'me.dm7.barcodescanner:zxing:1.9.8'
 }

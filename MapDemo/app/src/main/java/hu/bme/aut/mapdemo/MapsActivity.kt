@@ -3,6 +3,8 @@ package hu.bme.aut.mapdemo
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.location.Address
+import android.location.Geocoder
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -18,6 +20,7 @@ import com.google.android.gms.maps.model.*
 import com.google.maps.android.clustering.ClusterManager
 import kotlinx.android.synthetic.main.activity_maps.*
 import java.util.*
+import kotlin.concurrent.thread
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     MainLocationManager.OnNewLocationAvailable {
@@ -134,6 +137,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPostion))
         }
 
+        mMap.setOnMarkerClickListener { marker ->
+            geocodeLocation(marker!!.position)
+            false
+        }
+
         //mMap.setOnMarkerDragListener()
 
         // UNCOMMENT IT FOR SHOWING A POLYGON
@@ -194,6 +202,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
         markerCurrentPosition?.position = LatLng(location.latitude, location.longitude)
         mMap.animateCamera(CameraUpdateFactory.newLatLng(markerCurrentPosition?.position))
+    }
+
+    private fun geocodeLocation(location: LatLng) {
+        thread {
+            try {
+                val gc = Geocoder(this, Locale.getDefault())
+                var addrs: List<Address> =
+                    gc.getFromLocation(location.latitude, location.longitude, 3)
+                val addr =
+                    "${addrs[0].getAddressLine(0)}, ${addrs[0].getAddressLine(1)}, ${addrs[0].getAddressLine(2)}"
+
+                runOnUiThread {
+                    Toast.makeText(this, addr, Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this@MapsActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
 }

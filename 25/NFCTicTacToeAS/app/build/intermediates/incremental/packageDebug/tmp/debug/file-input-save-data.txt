@@ -1,0 +1,7 @@
+#Internal package file, do not edit.
+#Mon May 10 20:38:58 CEST 2021
+0.baseType=DIRECTORY
+0.base=D\:\\Development\\VC\\AIT2021Spring\\25\\NFCTicTacToeAS\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\0
+0.path=classes.dex
+0.set=DEX
+count=1
